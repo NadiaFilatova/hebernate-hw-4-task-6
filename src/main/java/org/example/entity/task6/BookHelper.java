@@ -56,4 +56,20 @@ public class BookHelper {
         session.getTransaction().commit();
         session.close();
     }
+    public void deleteByID(Long bookID){
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+        Book book =session.get(Book.class, bookID);
+session.remove(book);
+        session.getTransaction().commit();
+        session.close();
+    }
+    public void deleteByAuthorName(String authorName){
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+        Query query = session.createQuery("DELETE Book WHERE author.name =:name ");
+        query.setParameter("name", authorName).executeUpdate();
+        session.getTransaction().commit();
+        session.close();
+    }
 }

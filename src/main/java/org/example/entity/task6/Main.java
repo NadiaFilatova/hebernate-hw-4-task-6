@@ -22,21 +22,22 @@ public class Main {
         //Из пакета ex_002_insert_and_update создайте в цикле 200 объектов author и сохраните в БД.
         // Значения полей могут быть любыми.
         // Используйте метод flush для каждых 10 объектов. Метод сommit выполняйте один раз в конце.
-        List<Author> authors = IntStream.range(1, 201)
-                .mapToObj(n -> randomAuthor())
-                .toList();
-        authorHelper.saveAuthors(authors);
+        //List<Author> authors = IntStream.range(1, 201)
+        //      .mapToObj(n -> randomAuthor())
+        //    .toList();
+        // authorHelper.saveAuthors(authors);
 
-        // getting books list by author name
-        bookHelper.getByAuthorName("Stacey").forEach(book -> log.info(book.toString()));
 
-// К дополнительному заданию добавить метод обновления имени автора по id.
-        authorHelper.updateName("Florentino Updated", 1L);
-        log.info(authorHelper.getAuthorById(1).toString());
+        // hw - 6
+        //Обновить поле name для всех записей, у которых длина значения поля last_name больше 7
+        // В поле name записать значение «1»
+        // * Задание на самостоятельный поиск решений.
+        authorHelper.updateByLastNameLengthGreaterThan(7);
 
-        //К дополнительному заданию добавить метод обновления имени book по id.
-        bookHelper.updateNameById("A Scanner Darkly Updated", 1L);
-        log.info(bookHelper.getById(1).toString());
+        // В класс BookHelper пакета ex_004_relations дописать методы удаления книге по id и по автору.
+        bookHelper.deleteByID(4L);
+        bookHelper.deleteByAuthorName("Art");
+
     }
 
     private static Author randomAuthor() {

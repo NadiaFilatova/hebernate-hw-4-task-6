@@ -67,4 +67,13 @@ public class AuthorHelper {
         session.getTransaction().commit();
         session.close();
     }
+
+    public void updateByLastNameLengthGreaterThan(int length) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+        org.hibernate.query.Query query = session.createQuery("UPDATE Author set name = '1' where length(lastName)>:targetLength");
+        query.setParameter("targetLength", length).executeUpdate();
+        session.getTransaction().commit();
+        session.close();
+    }
 }
