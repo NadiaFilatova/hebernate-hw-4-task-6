@@ -10,8 +10,12 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column
     private String name;
-    private String authorName;
+
+    @ManyToOne(targetEntity = Author.class)
+    @JoinColumn(name = "author_id", nullable = false)
+    private Author author;
 
     public long getId() {
         return id;
@@ -25,16 +29,18 @@ public class Book {
         return name;
     }
 
+    public Author getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(Author author) {
+        this.author = author;
+    }
+
     public void setName(String name) {
         this.name = name;
-    }
 
-    public String getAuthorName() {
-        return authorName;
-    }
 
-    public void setAuthorName(String authorName) {
-        this.authorName = authorName;
     }
 
     @Override
@@ -42,7 +48,6 @@ public class Book {
         return "Book{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", authorName='" + authorName + '\'' +
                 '}';
     }
 }
