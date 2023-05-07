@@ -2,64 +2,73 @@ package org.example.entity.task6;
 
 import com.github.javafaker.Faker;
 import com.github.javafaker.Name;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
 
-//@Slf4j
+@Slf4j
 public class Main {
-    private static final Logger log = LoggerFactory.getLogger(Main.class);
     private static final Faker faker = new Faker();
+    private static final Random random = new Random();
+    private static final AuthorService authorService = new AuthorService();
+    private static final BookService bookService = new BookService();
 
     public static void main(String[] args) {
-        AuthorHelper authorHelper = new AuthorHelper();
-        BookHelper bookHelper = new BookHelper();
-
-        // random books and authors generation
-        //Из пакета ex_002_insert_and_update создайте в цикле 200 объектов author и сохраните в БД.
-        // Значения полей могут быть любыми.
-        // Используйте метод flush для каждых 10 объектов. Метод сommit выполняйте один раз в конце.
-        //List<Author> authors = IntStream.range(1, 201)
-        //      .mapToObj(n -> randomAuthor())
-        //    .toList();
-        // authorHelper.saveAuthors(authors);
-
-
-        // hw - 6
-        //Обновить поле name для всех записей, у которых длина значения поля last_name больше 7
-        // В поле name записать значение «1»
-        // * Задание на самостоятельный поиск решений.
-        authorHelper.updateByLastNameLengthGreaterThan(7);
-
-        // В класс BookHelper пакета ex_004_relations дописать методы удаления книге по id и по автору.
-        bookHelper.deleteByID(4L);
-        bookHelper.deleteByAuthorName("Art");
-
+        //Задание 4
+        //Используя MySQL Workbench переписать базу данных так, чтобы одну книгу могли б написать несколько
+        // авторов, также один автор может написать несколько книг.
+        // Реализовать связь многие ко многим.
+        List<Author> authors = new ArrayList<>();
+        while (authors.size() < 200) {
+            authors.addAll(generateRandomAuthorsAndBooks());
+        }
+        authorService.saveAuthors(authors);
+        //Задание 5
+        //  Из пакета ex_002_select_where написать отдельный метод для выборки по поиску выражения
+        authorService.findByFirstNameOrLastNameLike("ro").forEach(author -> log.info("{}", author));
     }
 
-    private static Author randomAuthor() {
-        Name fakeName = faker.name();
+    private static List<Author> generateRandomAuthorsAndBooks() {
+        int authorsCount = randomInt(1, 4);
+        log.info("Authors count: {}", authorsCount);
 
-        Author author = new Author();
-        author.setName(fakeName.firstName());
-        author.setLastName(fakeName.lastName());
-
-        Random random = new Random();
-        List<Book> authorBooks = IntStream.range(1, random.nextInt(5))
-                .mapToObj(n -> randomBook())
-                .peek(book -> book.setAuthor(author))
+        List<Author> authors = IntStream.range(1, authorsCount)
+                .mapToObj(n -> randomAuthor())
                 .toList();
 
-        author.setBooks(authorBooks);
-        return author;
+        int booksCount = randomInt(4, 10);
+        log.info("Books count: {}", booksCount);
+
+        List<Book> books = IntStream.range(1, booksCount)
+                .mapToObj(n -> randomBook())
+                .toList();
+
+        books.forEach(book -> book.getAuthors().addAll(authors));
+        authors.forEach(author -> author.getBooks().addAll(books));
+
+        log.info("");
+        return authors;
     }
 
     private static Book randomBook() {
         Book book = new Book();
         book.setName(faker.book().title());
         return book;
+    }
+
+    private static Author randomAuthor() {
+        Author author = new Author();
+        Name fakeName = faker.name();
+
+        author.setName(fakeName.firstName());
+        author.setLastName(fakeName.lastName());
+        return author;
+    }
+
+    private static int randomInt(int min, int max) {
+        return random.nextInt(max - min) + min;
     }
 }
